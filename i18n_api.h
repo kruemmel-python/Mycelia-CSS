@@ -38,6 +38,18 @@ I18N_API int i18n_translate(void* ptr,
                             int args_len,
                             char* out_buf,
                             int buf_size);
+I18N_API int i18n_render_to_html(void* ptr,
+                                 const char* token,
+                                 const char** args,
+                                 int args_len,
+                                 char* out_buf,
+                                 int buf_size);
+I18N_API int i18n_get_physics_json(void* ptr,
+                                   const char* token,
+                                   const char** args,
+                                   int args_len,
+                                   char* out_buf,
+                                   int buf_size);
 // Count steuert, ob {one}, {other} oder {zero} genutzt wird. Rückgabe: Länge oder -1 bei Fehler.
 I18N_API int i18n_translate_plural(void* ptr,
                                    const char* token,

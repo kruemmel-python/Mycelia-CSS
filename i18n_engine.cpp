@@ -295,7 +295,7 @@ bool I18nEngine::parse_line(const std::string& line_in,
     token = base_token;
   }
 
-  if (!is_hex_token(base_token) && !is_style_token(base_token)) {
+  if (!is_hex_token(base_token) && !is_style_token(base_token) && !is_template_token(base_token)) {
     out_err = "Token ist kein gültiger Hex-String (6–32 Zeichen).";
     return false;
   }
@@ -650,6 +650,137 @@ bool I18nEngine::try_build_style_string(const StyleCatalogSnapshot* style_state,
   if (builder.empty()) return false;
   out_style = std::move(builder);
   return true;
+}
+
+std::vector<std::string> I18nEngine::gather_style_tokens(const std::string& text) const {
+  std::vector<std::string> refs;
+  scan_inline_refs(text, refs);
+  std::vector<std::string> tokens;
+  std::unordered_set<std::string> seen;
+  for (const auto& token : refs) {
+    if (!is_style_token(token)) continue;
+    if (seen.insert(token).second) tokens.push_back(token);
+  }
+  return tokens;
+}
+
+std::string I18nEngine::get_physics_json(const std::vector<std::string>& style_tokens) {
+  std::ostringstream ss;
+  ss << "{";
+  bool first = true;
+  for (const auto& token : style_tokens) {
+    NativeStyle phys = get_native_style(token, {});
+    if (!phys.has_physical) continue;
+    if (!first) ss << ",";
+    first = false;
+    ss << "\"" << token << "\":";
+    ss << "{\"mass\":" << std::to_string(phys.mass);
+    ss << ",\"friction\":" << std::to_string(phys.friction);
+    ss << ",\"spacing\":" << std::to_string(phys.spacing) << "}";
+  }
+  ss << "}";
+  return ss.str();
+}
+
+std::string I18nEngine::get_physics_json_from_template(const std::string& template_token,
+                                                       const std::vector<std::string>& args) {
+  auto snapshot = acquire_snapshot();
+  if (!snapshot) return "{}";
+  auto style_snapshot = std::dynamic_pointer_cast<const StyleCatalogSnapshot>(snapshot);
+  if (!style_snapshot) return "{}";
+  std::string normalized = to_lower_ascii(template_token);
+  auto it = style_snapshot->catalog.find(normalized);
+  if (it == style_snapshot->catalog.end()) return "{}";
+
+  std::unordered_set<std::string> seen;
+  std::string resolved =
+      resolve_template_placeholders(style_snapshot.get(), it->second, args, seen, 0);
+
+  auto style_tokens = gather_style_tokens(resolved);
+  return get_physics_json(style_tokens);
+}
+
+std::string I18nEngine::resolve_template_placeholders(const CatalogSnapshot* state,
+                                                      const std::string& raw,
+                                                      const std::vector<std::string>& args,
+                                                      std::unordered_set<std::string>& seen,
+                                                      int depth) {
+  if (depth > 32) return "⟦RECURSION_LIMIT⟧";
+  if (!state) return raw;
+  std::string out;
+  out.reserve(raw.size());
+
+  for (size_t i = 0; i < raw.size();) {
+    if (raw[i] == '%' && i + 1 < raw.size() && is_digit((unsigned char)raw[i + 1])) {
+      size_t j = i + 1;
+      int idx = 0;
+      while (j < raw.size() && is_digit((unsigned char)raw[j])) {
+        idx = idx * 10 + (raw[j] - '0');
+        ++j;
+      }
+
+      if (idx >= 0 && (size_t)idx < args.size()) {
+        out += resolve_arg(state, args[(size_t)idx], seen, depth + 1);
+      } else {
+        out += "⟦arg:" + std::to_string(idx) + "⟧";
+      }
+
+      i = j;
+      continue;
+    }
+
+    out += raw[i];
+    ++i;
+  }
+
+  return out;
+}
+
+bool I18nEngine::build_style_definitions(const StyleCatalogSnapshot* style_state,
+                                         const std::vector<std::string>& tokens,
+                                         const std::vector<std::string>& args,
+                                         std::string& out_defs) {
+  if (!style_state || tokens.empty()) return false;
+  std::unordered_set<std::string> classes;
+  std::ostringstream ss;
+
+  for (const auto& token : tokens) {
+    if (!is_style_token(token)) continue;
+    std::unordered_set<std::string> seen;
+    std::string style_string;
+    if (!try_build_style_string(style_state, token, args, seen, 0, style_string)) continue;
+    if (style_string.empty()) continue;
+    std::string class_name = sanitize_css_class(token);
+    if (!classes.insert(class_name).second) continue;
+    ss << "." << class_name << "{" << style_string << "}\n";
+  }
+
+  out_defs = ss.str();
+  return !out_defs.empty();
+}
+
+std::string I18nEngine::sanitize_css_class(const std::string& token) {
+  std::string out;
+  out.reserve(token.size());
+  for (char c : token) {
+    if (std::isalnum((unsigned char)c) || c == '_' || c == '-') {
+      out += c;
+    } else if (c == '{' || c == '}') {
+      out += '-';
+    } else {
+      out += '_';
+    }
+  }
+  return out;
+}
+
+void I18nEngine::replace_all(std::string& subject, const std::string& search, const std::string& replacement) {
+  if (search.empty()) return;
+  size_t pos = 0;
+  while ((pos = subject.find(search, pos)) != std::string::npos) {
+    subject.replace(pos, search.size(), replacement);
+    pos += replacement.size();
+  }
 }
 
 std::string I18nEngine::read_file_utf8(const char* path, std::string& err) {
@@ -1078,6 +1209,39 @@ std::string I18nEngine::translate(const std::string& token_in, const std::vector
   return translate_impl(snapshot.get(), token, args, seen, 0);
 }
 
+std::string I18nEngine::render_to_html(const std::string& template_token, const std::vector<std::string>& args) {
+  auto snapshot = acquire_snapshot();
+  if (!snapshot) return {};
+  auto style_snapshot = std::dynamic_pointer_cast<const StyleCatalogSnapshot>(snapshot);
+  if (!style_snapshot) return {};
+  std::string normalized = to_lower_ascii(template_token);
+  auto it = style_snapshot->catalog.find(normalized);
+  if (it == style_snapshot->catalog.end()) return {};
+
+  std::unordered_set<std::string> seen;
+  std::string resolved = resolve_template_placeholders(style_snapshot.get(), it->second, args, seen, 0);
+
+  auto style_tokens = gather_style_tokens(resolved);
+
+  std::string style_defs;
+  build_style_definitions(style_snapshot.get(), style_tokens, args, style_defs);
+
+  for (const auto& token : style_tokens) {
+    std::string placeholder = "@" + token;
+    replace_all(resolved, placeholder, sanitize_css_class(token));
+  }
+
+  if (!style_defs.empty()) {
+    return "<style>\n" + style_defs + "</style>\n" + resolved;
+  }
+  return resolved;
+}
+
+std::string I18nEngine::get_physics_json_for_template(const std::string& template_token,
+                                                      const std::vector<std::string>& args) {
+  return get_physics_json_from_template(template_token, args);
+}
+
 std::string I18nEngine::translate_plural(const std::string& token_in,
                                          int count,
                                          const std::vector<std::string>& args) {
@@ -1413,6 +1577,17 @@ bool I18nEngine::is_style_token(const std::string& token) noexcept {
   static constexpr size_t STYLE_PREFIX_LEN = 6;
   if (base.size() <= STYLE_PREFIX_LEN) return false;
   return starts_with(base, STYLE_PREFIX);
+}
+
+bool I18nEngine::is_template_token(const std::string& token) noexcept {
+  std::string base = token;
+  std::string variant;
+  if (!parse_variant_suffix(token, base, variant)) {
+    base = token;
+  }
+  const char* TEMPLATE_PREFIX = "tpl_";
+  static constexpr size_t TEMPLATE_PREFIX_LEN = 4;
+  return base.size() > TEMPLATE_PREFIX_LEN && starts_with(base, TEMPLATE_PREFIX);
 }
 
 bool I18nEngine::parse_style_properties(const std::string& text, std::vector<StyleProperty>& out_props) {

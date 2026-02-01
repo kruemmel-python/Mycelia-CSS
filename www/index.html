@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Mycelia Matrix Live</title>
+<style>
+.style_base-container{display: flex; flex-direction: column; gap: 1rem; padding: 1.5rem; background-color: #020617; color: #f8fafc;}
+.style_cube-ice{--mass: 1.05; --friction: 0.08; --restitution: 0.72; --spacing: 0.8; background-color: #e2e8f0; border-color: #38bdf8; border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 20px 40px rgba(59,130,246,0.35); text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700; color: #0f172a; transition: transform 400ms ease, box-shadow 400ms ease;}
+.style_grid-3{display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem;}
+.style_hero-banner{display: flex; align-items: center; justify-content: space-between; gap: 2rem; padding: 2.5rem; border-radius: 1.75rem; background: linear-gradient(115deg, #312e81, #1e1b4b); box-shadow: 0 30px 60px rgba(15,23,42,0.55);}
+.style_lead{font-size: 2.1rem; font-weight: 700; color: #e0e7ff;}
+.style_nav-bar{display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-radius: 0 0 1.5rem 1.5rem; background: linear-gradient(135deg, #312e81, #0f172a); box-shadow: 0 20px 45px rgba(3,7,18,0.6);}
+.style_nav-cta{box-shadow: 0 10px 20px rgba(0,0,0,0.12); padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 600; border: none; transition: transform 120ms ease, box-shadow 120ms ease; color: #020617; background: #38bdf8; color: #020617; border-radius: 999px;}
+.style_nav-link{font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(248,250,252,0.9); font-weight: 500;}
+.style_primary-button{box-shadow: 0 10px 20px rgba(0,0,0,0.12); padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 600; border: none; transition: transform 120ms ease, box-shadow 120ms ease; color: #020617; background: #38bdf8; color: #020617;}
+.style_secondary-button{box-shadow: 0 10px 20px rgba(0,0,0,0.12); padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 600; border: none; transition: transform 120ms ease, box-shadow 120ms ease; color: #020617; background: transparent; border: 1px solid rgba(248,250,252,0.6); color: rgba(248,250,252,0.9);}
+.style_small-caps{letter-spacing: 0.35em; font-size: 0.75rem; text-transform: uppercase; color: rgba(226,232,240,0.8);}
+.style_subhead{font-size: 0.75rem; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(226,232,240,0.85);}
+.style_text-muted{color: rgba(226,232,240,0.75); font-size: 0.95rem; letter-spacing: 0.02em;}
+</style>
+<style>
+.style_card{border: 1px solid #eef2ff; border-radius: 1rem; box-shadow: 0 20px 40px rgba(0,0,0,0.08); background-color: Sichere Kanäle; padding: 1.25rem; transition: transform 180ms ease, border-color 180ms ease;}
+.style_card-header{font-size: 1.125rem; font-weight: 600; color: #eef2ff;}
+</style>
+<style>
+.style_card{border: 1px solid #f4f3ff; border-radius: 1rem; box-shadow: 0 20px 40px rgba(0,0,0,0.08); background-color: Global Reach; padding: 1.25rem; transition: transform 180ms ease, border-color 180ms ease;}
+.style_card-header{font-size: 1.125rem; font-weight: 600; color: #f4f3ff;}
+</style>
+<style>
+.style_card{border: 1px solid #ffedec; border-radius: 1rem; box-shadow: 0 20px 40px rgba(0,0,0,0.08); background-color: SubQG Health; padding: 1.25rem; transition: transform 180ms ease, border-color 180ms ease;}
+.style_card-header{font-size: 1.125rem; font-weight: 600; color: #ffedec;}
+</style>
+<style>
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, rgba(59,130,246,0.35), rgba(15,23,42,0.95)) #020617;
+  font-family: 'Manrope', 'Inter', system-ui, sans-serif;
+  color: #e2e8ff;
+}
+main {
+  width: 100%;
+}
+.style_grid-3 article {
+  min-height: 190px;
+  padding-bottom: 1rem;
+}
+#hero-ice {
+  min-width: 260px;
+  min-height: 160px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0f172a;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  transition: transform 400ms ease, box-shadow 400ms ease;
+}
+#hero-ice::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0.3;
+  background: linear-gradient(135deg, rgba(59,130,246,0.8), rgba(14,165,233,0.4));
+  filter: blur(18px);
+  z-index: -1;
+}
+#hero-ice:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 30px 60px rgba(14,165,233,0.8);
+}
+.style_hero-banner {
+  flex-wrap: wrap;
+}
+@media (max-width: 960px) {
+  .style_grid-3 {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+  .style_hero-banner {
+    flex-direction: column;
+  }
+}
+</style>
+
+  <script>
+    const MyceliaPhysics = {"style_base-container":{"mass":0.000000,"friction":0.000000,"spacing":1.000000},"style_cube-ice":{"mass":1.050000,"friction":0.080000,"spacing":0.800000},"style_grid-3":{"mass":0.000000,"friction":0.000000,"spacing":1.500000},"style_hero-banner":{"mass":0.000000,"friction":0.000000,"spacing":2.000000}};
+    const cubeStyle = MyceliaPhysics['style_cube-ice'] || MyceliaPhysics['style_cube-heavy'];
+    console.log('Matrix geladen. Physik für Ice-Cube:', cubeStyle);
+
+    function lerp(min, max, t) {
+      return min + (max - min) * Math.max(0, Math.min(1, t));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const heroIce = document.getElementById('hero-ice');
+      if (!heroIce) return;
+      const mass = cubeStyle.mass || 1;
+      const friction = Math.min(Math.max(cubeStyle.friction || 0.3, 0), 1);
+      const spacing = cubeStyle.spacing || 1;
+      function animate(time) {
+        const period = 1200 + (1 - friction) * 900;
+        const bounce = Math.sin(time / period) * spacing * 22;
+        const scale = 1 + Math.abs(Math.sin(time / (period * 0.9))) * mass * 0.03;
+        const glow = lerp(0.35, 0.65, Math.abs(Math.sin(time / period)));
+        heroIce.style.transform = `translateY(${bounce}px) scale(${scale})`;
+        heroIce.style.boxShadow = `0 30px 60px rgba(59,130,246,${glow})`;
+        requestAnimationFrame(animate);
+      }
+      requestAnimationFrame(animate);
+    });
+  </script>
+</head>
+<body>
+  <div class="style_base-container" style="min-height:100vh;"> <nav class="style_nav-bar"> <div class="style_small-caps">Mycelia Matrix</div> <div style="display:flex; gap:1rem; align-items:center;"> <a class="style_nav-link" href="index.html">Home</a> <a class="style_nav-link" href="services.html">Services</a> <a class="style_nav-link" href="matrix.html">Matrix</a> <a class="style_nav-link" href="insights.html">Insights</a> </div> <a class="style_nav-cta" href="services.html">Contact</a> </nav> <section class="style_hero-banner"> <div> <p class="style_subhead">Konzept Monitoring</p> <h1 class="style_lead">All Comprehensive Solution In One Platform</h1> <p class="style_text-muted">Wir orchestrieren Tailwind-gestützte Styles und native Physik, damit dein Live-Grid sofort reagiert.</p> <div style="margin-top:1.5rem; display:flex; gap:0.75rem;"><a class="style_primary-button" href="services.html">Get in Touch</a><a class="style_secondary-button" href="insights.html">Explore More</a></div> </div> <div id="hero-ice" class="style_cube-ice">Live Ice Cube</div> </section> <div class="style_grid-3"><article class="style_card" style="background-color:#eef2ff;"><h3 class="style_card-header">Sichere Kanäle</h3><p><p>Verschlüsselung über den gesamten Stack.</p></p></article><article class="style_card" style="background-color:#f4f3ff;"><h3 class="style_card-header">Global Reach</h3><p><p>100+ Länder vertrauen der Matrix.</p></p></article><article class="style_card" style="background-color:#ffedec;"><h3 class="style_card-header">SubQG Health</h3><p><p>Reibung &amp; Masse in perfektem Balance.</p></p></article></div> </div>
+</body>
+</html>

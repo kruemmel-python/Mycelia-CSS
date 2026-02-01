@@ -11,6 +11,7 @@ This repository hosts the **Mycelia I18n/Style Engine**, a hybrid translation/st
 | `I18n.cs` | .NET wrapper (Unity-friendly) that mirrors the API, adds `GetStyle`, and exposes `NativeStyle` (includes `Spacing`) along with helper methods to feed `Translate` with dynamic args. |
 | `i18n_qa.py` | QA harness that loads `tailwind_style_catalog.i18n`, asserts style inheritance, placeholder injection, native physics translation, spacing, and exports a binary catalog for validation. |
 | `main.cpp` + `mycelia_test.exe` | Zero-copy demo: prints mass/friction/spacing, shows ANSI color swatches, and implements a file-watch live-reload loop that hot-swaps the catalog when `tailwind_style_catalog.i18n` changes. |
+| `tpl_main-layout` + `render_to_html` | Template token demonstrating HTML layout and the new `RenderToHtml` API that composes CSS class definitions for referenced `style_` tokens, producing a ready-to-serve HTML page. |
 | `tailwind_style_catalog.i18n` | Tailwind-inspired tokens with CSS properties, physics directives (`--mass`, `--friction`, `--spacing`), style inheritance, and hover/focus variants. |
 | `tailwind_config_example.i18n` | Tailwind config-like source of truth that you can port directly into your catalog (extends colors, spacing, transitions). |
 
@@ -37,6 +38,30 @@ The first invocation compiles the test harness, then prints the current table of
 ```bash
 i18n_export_binary(final_vision.bin)
 ```
+
+## Rendering Tailwind Templates
+
+Templates live under tokens prefixed with `tpl_` (see `tpl_main-layout` in `tailwind_style_catalog.i18n`). They contain the HTML skeleton, Tailwind-style `@style_*` references, and placeholders (`%0` … `%n`) for dynamic content.
+
+The new `RenderToHtml` API (native: `i18n_render_to_html`; managed: `I18n.RenderToHtml`) resolves `%n` placeholders, collects every `@style_*` reference, emits a `<style>` block with real CSS definitions, and swaps each `@style_*` into a sanitized CSS class name. Call this API to render a full page, for example:
+
+```csharp
+var html = i18n.RenderToHtml("tpl_main-layout", new[] { "#0f172a", "#f8fafc", "#0ea5e9", "#fecdd3", "Willkommen", "<p>Physikalischer Content</p>" });
+```
+
+Because this happens inside the DLL, the resulting string contains fully resolved CSS and is safe to stream to a UI context (Unity, web socket, Electron, etc.).
+
+## Generating a standalone HTML page
+
+The repository now includes `generate_html.py`, which loads `tailwind_style_catalog.i18n`, calls `RenderToHtml("tpl_main-layout", ...)`, and writes a ready-to-serve HTML file to `www/index.html`. Run it whenever you tweak the catalog:
+
+```bash
+python generate_html.py
+```
+
+Then open `www/index.html` (or serve the `www` folder via your favorite static server) to see how the DLL has turned your template into real HTML plus `<style>` definitions derived from the `style_*` tokens. Because the template reuses the same engine, colors, spacing, and physics-aware semantics stay perfectly synchronized with the rest of the system.
+
+As part of the 1.2 release, `generate_html.py` also injects the `MyceliaPhysics` JSON into a `<script>` tag inside the generated page. The script logs the values for `style_cube-ice`, animates a floating cube element whose speed is derived from the DLL-provided friction, and proves that the browser can react to the same mass/friction/spacing values that you define in C++. This closes the loop between native physics and web presentation: edit the `.i18n`, rerun the generator, and your HTML + JS reflect the new reality instantly.
 
 Use the DLL to emit a compact binary catalog (includes metadata and FNV1a32 checksum) that your UI/GPU layer can mmap with zero-copy safety.
 

@@ -84,6 +84,7 @@ private:
   static bool looks_like_binary_catalog(const std::string& data) noexcept;
   static bool parse_variant_suffix(const std::string& token, std::string& out_base, std::string& out_variant);
   static bool is_variant_valid(const std::string& variant) noexcept;
+  static bool is_template_token(const std::string& token) noexcept;
   static uint32_t fnv1a32(const uint8_t* data, size_t len) noexcept;
   static bool parse_meta_line(const std::string& line, std::string& key, std::string& value);
   static PluralRule parse_plural_rule_name(std::string v, bool& ok);
@@ -114,6 +115,20 @@ private:
                               std::unordered_set<std::string>& seen,
                               int depth,
                               std::string& out_style);
+  std::string resolve_template_placeholders(const CatalogSnapshot* state,
+                                            const std::string& raw,
+                                            const std::vector<std::string>& args,
+                                            std::unordered_set<std::string>& seen,
+                                            int depth);
+  bool build_style_definitions(const StyleCatalogSnapshot* style_state,
+                               const std::vector<std::string>& tokens,
+                               const std::vector<std::string>& args,
+                               std::string& out_defs);
+  static std::string sanitize_css_class(const std::string& token);
+  static void replace_all(std::string& subject, const std::string& search, const std::string& replacement);
+  std::vector<std::string> gather_style_tokens(const std::string& text) const;
+  std::string get_physics_json(const std::vector<std::string>& style_tokens);
+  std::string get_physics_json_from_template(const std::string& template_token, const std::vector<std::string>& args);
 
   std::shared_ptr<CatalogSnapshot> build_snapshot_from_text(std::string&& src, bool strict, std::string& err);
   std::shared_ptr<CatalogSnapshot> build_snapshot_from_binary(const uint8_t* data, size_t size, bool strict,
@@ -138,6 +153,8 @@ public:
   bool reload();
   std::string translate(const std::string& token_in, const std::vector<std::string>& args);
   std::string translate_plural(const std::string& token_in, int count, const std::vector<std::string>& args);
+  std::string render_to_html(const std::string& template_token, const std::vector<std::string>& args);
+  std::string get_physics_json_for_template(const std::string& template_token, const std::vector<std::string>& args);
   std::string dump_table() const;
   std::string find_any(const std::string& query) const;
   std::string check_catalog_report(int& out_code) const;

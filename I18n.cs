@@ -51,6 +51,9 @@ namespace I18nTokenEngine
         private static extern int i18n_translate(IntPtr ptr, byte[] token, IntPtr args, int argsLen, byte[] outBuf, int bufSize);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int i18n_render_to_html(IntPtr ptr, byte[] token, IntPtr args, int argsLen, byte[] outBuf, int bufSize);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int i18n_translate_plural(IntPtr ptr, byte[] token, int count, IntPtr args, int argsLen, byte[] outBuf, int bufSize);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
@@ -122,6 +125,29 @@ namespace I18nTokenEngine
 
                 var buffer = new byte[len + 1];
                 Execute(handle => i18n_translate(handle, tokenCStr, argsRoot.AddrOfPinnedObject(), args.Length, buffer, buffer.Length));
+                return Encoding.UTF8.GetString(buffer, 0, len);
+            }
+            finally
+            {
+                ReleaseHandles(handles);
+            }
+        }
+
+        public string RenderToHtml(string token, params string[] args)
+        {
+            var tokenBytes = Encoding.UTF8.GetBytes(token);
+            var tokenCStr = new byte[tokenBytes.Length + 1];
+            Array.Copy(tokenBytes, tokenCStr, tokenBytes.Length);
+
+            PrepareArgs(args, out var handles, out var argPtrs);
+            try
+            {
+                using var argsRoot = GCHandle.Alloc(argPtrs, GCHandleType.Pinned);
+                int len = Execute(handle => i18n_render_to_html(handle, tokenCStr, argsRoot.AddrOfPinnedObject(), args.Length, null, 0));
+                if (len < 0) throw new InvalidOperationException($"I18n error: {_last_error()}");
+
+                var buffer = new byte[len + 1];
+                Execute(handle => i18n_render_to_html(handle, tokenCStr, argsRoot.AddrOfPinnedObject(), args.Length, buffer, buffer.Length));
                 return Encoding.UTF8.GetString(buffer, 0, len);
             }
             finally

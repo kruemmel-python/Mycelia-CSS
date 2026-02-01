@@ -168,6 +168,34 @@ I18N_API int i18n_translate(void* ptr,
   return copy_to_buffer(e, res, out_buf, buf_size);
 }
 
+I18N_API int i18n_render_to_html(void* ptr,
+                                 const char* token,
+                                 const char** args,
+                                 int args_len,
+                                 char* out_buf,
+                                 int buf_size) {
+  if (!ptr || !token) return -1;
+  auto vec_args = build_vec_args(args, args_len);
+  auto* e = as_engine(ptr);
+  if (!begin_engine_call(e)) return -1;
+  const std::string res = e->render_to_html(token, vec_args);
+  return copy_to_buffer(e, res, out_buf, buf_size);
+}
+
+I18N_API int i18n_get_physics_json(void* ptr,
+                                   const char* token,
+                                   const char** args,
+                                   int args_len,
+                                   char* out_buf,
+                                   int buf_size) {
+  if (!ptr || !token) return -1;
+  auto vec_args = build_vec_args(args, args_len);
+  auto* e = as_engine(ptr);
+  if (!begin_engine_call(e)) return -1;
+  const std::string res = e->get_physics_json_for_template(token, vec_args);
+  return copy_to_buffer(e, res, out_buf, buf_size);
+}
+
 I18N_API int i18n_translate_plural(void* ptr,
                                    const char* token,
                                    int count,
