@@ -1,0 +1,35 @@
+@meta locale=en
+@meta fallback=en
+@meta note=Tailwind-like config example that can be parsed as a style catalog.
+
+# Tailwind config fragment translated into .i18n style tokens.
+# module.exports = {
+#   theme: {
+#     extend: {
+#       colors: {
+#         "night-sky": "#0f172a",
+#         "aurora": "#a855f7",
+#         "sunrise": "#f97316"
+#       },
+#       spacing: {
+#         "dynamic-grid": "2rem",
+#         "compact": "0.75rem"
+#       },
+#       transitionDuration: {
+#         "slow": "500ms",
+#         "fast": "120ms"
+#       }
+#     }
+#   }
+# }
+
+# Style tokens derived directly from the above theme extension.
+style_theme-night-sky: background-color: %0; color: %1; padding: var(--dynamic-grid); border-radius: 1.25rem; --mass: 3.1; --friction: 0.82; transition: transform 500ms ease;
+style_theme-night-sky{hover}: @style_theme-night-sky; transform: translateY(-6px);
+style_theme-night-sky{focus-visible}: outline: 2px solid %2; outline-offset: 4px;
+
+style_theme-aurora-gradient: background: linear-gradient(120deg, %0, %1); color: #ffffff; padding: 1.5rem; box-shadow: 0 25px 60px rgba(168,85,247,0.3); --spacing: 1.25; --mass: 1.6;
+
+style_shadow-sunrise: box-shadow: 0 20px 40px rgba(%0, %1, %2, 0.35);
+style_grid-dynamic: display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--dynamic-grid); align-items: stretch; --spacing: 2.0;
+style_grid-dynamic{dense}: @style_grid-dynamic; gap: var(--compact);
