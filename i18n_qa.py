@@ -108,6 +108,7 @@ def main():
     card_style = engine.translate("style_card", ["#3b82f6", "#ffffff"])
     assert "border: 1px solid #3b82f6" in card_style, "Card border color not injected"
     assert "background-color: #ffffff" in card_style, "Card background not injected"
+    assert "box-shadow" in card_style, "Card shadow definition missing"
 
     hover_style = engine.translate("style_card{hover}", ["#3b82f6", "#ffffff"])
     assert "transform: translateY(-4px)" in hover_style, "Hover transformation missing"
@@ -121,6 +122,9 @@ def main():
     bounce_style = engine.translate("style_cube-bounce")
     assert "box-shadow: 0 10px 30px rgba(59,130,246,0.6)" in bounce_style, "Bounce shadow missing"
     assert "--restitution: 0.95" in bounce_style, "Bounce restitution override missing"
+
+    image_card = engine.translate("tpl_image-card", ["assets/placeholder.svg", "Live Card", "<p>Content</p>"])
+    assert "background-image" in image_card, "Image card missing background-image"
 
     engine.export_binary("final_vision_v1.1.bin")
 

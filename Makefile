@@ -26,6 +26,15 @@ qa:
 	@echo "Running Quality Assurance..."
 	$(PYTHON) i18n_qa.py
 
+export-bin: $(TARGET)
+	@echo "Exporting binary catalog..."
+	$(PYTHON) export_catalog.py final_vision_v1.2.bin
+
+deploy: export-bin
+	@echo "Binary catalog ready at final_vision_v1.2.bin"
+
+export: export-bin
+
 test_app: main.cpp $(TARGET)
 	$(CXX) $(CXX_EXEFLAGS) main.cpp -L. -li18n_engine -I. -o mycelia_test.exe
 

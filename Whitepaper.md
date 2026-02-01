@@ -78,6 +78,7 @@
 >
 > * **The Mesh (v1.2)** bringt `write_assets.py` + `generate_html.py`, was vier statische Seiten mit Bildkarten, Navigation, `MyceliaPhysics` JSON und animiertem Hero erzeugt.
 > * **Design + Physik aus einem Katalog**: `style_card-image`, `style_cube-*`, `tpl_image-card` steuern Bild, Layout und physikalische Parameter – die SVGs liegen unter `www/assets/`.
+> * **Unity Overlay Sample**: `samples/UnityPhysicsOverlay.cs` zeigt, wie man `LoadFile`, FileSystemWatcher und `TryGetNativeStyle` nutzt, um ComputeShaders in Echtzeit mit `mass`, `friction`, `spacing`, `restitution` zu füttern.
+> * **Binary Export Automation**: `export_catalog.py` (und `make export`) produziert `final_vision_v1.2.bin`, sodass das Release-Binary exakt zur aktuellen Katalogversion passt.
 > * **QA & Hot Reload**: `make` läuft weiter über `i18n_qa.py` und `main.cpp` überwacht den Katalog alle 500 ms, sodass Änderungen sofort in Web und nativen Clients sichtbar sind.
 >
-

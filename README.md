@@ -63,6 +63,16 @@ python generate_html.py
 
 Open any file under `www/` (or serve the entire folder) to inspect the layout that the DLL directly computed. The generator appends `<style>` blocks derived from your `style_*` catalog, replaces every `@style_*` reference with sanitized class names, and inserts a `<script>` that logs the physics data plus animates the floating cube using the same friction/mass values you defined—so editing `.i18n` and rerunning the scripts keeps HTML, CSS, and JS perfectly in sync with the native engine.
 
+## Automated binary export
+
+Whenever you ship a release, run:
+
+```bash
+make export
+```
+
+This target builds `i18n_engine` (if needed) and invokes `export_catalog.py final_vision_v1.2.bin`, which loads the fresh catalog and calls the native `i18n_export_binary` entry point. The resulting `final_vision_v1.2.bin` is suited for your asset pipeline, and you can commit or publish it alongside the generated HTML site.
+
 Use the DLL to emit a compact binary catalog (includes metadata and FNV1a32 checksum) that your UI/GPU layer can mmap with zero-copy safety.
 
 ## Live-Reload Explanation
@@ -87,9 +97,10 @@ Use the DLL to emit a compact binary catalog (includes metadata and FNV1a32 chec
 Mycelia CSS v1.2 “The Mesh” is now shipping with:
 
 1. **Hybrid HTML Generator** – `write_assets.py` + `generate_html.py` now churn out four fully linked pages (`index.html`, `services.html`, `matrix.html`, `insights.html`) complete with image cards, navigation, and the `MyceliaPhysics` JSON payload that mirrors your DLL tokens.
-2. **Physics-Aware Assets** – Tailwind tokens such as `style_card-image`, `style_cube-*`, and `tpl_image-card` embed SVG URLs from `www/assets/`, letting the DLL deliver both design and physical behavior from the same catalog.
-3. **Animated Hero + Web+Native Sync** – The generated pages inject a `<script>` that animates `#hero-ice` via friction/mass values; the same values feed Unity/C# via `TryGetNativeStyle` and the zero-copy `main.cpp` demo.
-4. **Live Reload & QA** – `make` runs `i18n_qa.py` and the live watcher in `main.cpp` now samples the catalog every 500ms, hot-swapping snapshots atomically while the rest of the system keeps running.
+2. **Unity Overlay Sample** – `samples/UnityPhysicsOverlay.cs` demonstrates how to `LoadFile`, watch the catalog, call `TryGetNativeStyle`, and push `mass`, `friction`, `spacing`, `restitution` into a Unity ComputeShader before dispatch.
+3. **Physics-Aware Assets** – Tailwind tokens such as `style_card-image`, `style_cube-*`, and `tpl_image-card` embed SVG URLs from `www/assets/`, letting the DLL deliver both design and physical behavior from the same catalog.
+4. **Animated Hero + Web+Native Sync** – The generated pages inject a `<script>` that animates `#hero-ice` via friction/mass values; the same values feed Unity/C# via `TryGetNativeStyle` and the zero-copy `main.cpp` demo.
+5. **Live Reload & QA** – `make` runs `i18n_qa.py` and the live watcher in `main.cpp` now samples the catalog every 500ms, hot-swapping snapshots atomically while the rest of the system keeps running.
 
 ## Pipeline Visualization
 
@@ -117,9 +128,3 @@ Mycelia CSS v1.2 “The Mesh” is now shipping with:
 ```
 
 Each generated HTML still relies on the same DLL-powered data: templates resolve `@style_*` tokens, `tpl_image-card` materializes `background-image:url('%0')`, and the inserted script uses the DLL’s `MyceliaPhysics` JSON to animate the hero cube.
-
-## Next steps
-
-1. Build a Unity/WinUI overlay that listens to the catalog hot-reload events via `TryGetNativeStyle` and updates compute shaders with the new `mass`, `friction`, and `spacing`.
-2. Add catalog validation presets (e.g., ensuring `style_card` inherits from `style_card-border`) to `i18n_qa.py`.
-3. Automate binary deployment by invoking `i18n_export_binary` and committing `final_vision_vX.bin` or publishing it to your asset pipeline.
