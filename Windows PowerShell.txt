@@ -1,0 +1,31 @@
+PS D:\mycelia_CSS> make
+Running Quality Assurance...
+python i18n_qa.py
+QA PASS: style translation and native physics are valid.
+PS D:\mycelia_CSS> make run
+g++ -std=c++17 -O3 -Wall main.cpp -L. -li18n_engine -I. -o mycelia_test.exe
+Starte Mycelia CSS Test...
+./mycelia_test.exe
+--- Mycelia Matrix: Physical Style Resolution ---
+Token                 Mass      Friction    Spacing
+--------------------------------------------------------
+style_cube-heavy      4.2       0.92        1.5
+    Resulting style string: --mass: 4.2; --friction: 0.92; --restitution: 0.18; --spacing: 1.5; background-color: #0f172a; border: 1px solid #0f172a; border-radius: 1rem; box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        #0f172a (RGB 15,23,42)
+
+style_cube-ice        1.05      0.08        0.8
+    Resulting style string: --mass: 1.05; --friction: 0.08; --restitution: 0.72; --spacing: 0.8; background-color: #e2e8f0; border-color: #38bdf8; border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 20px 40px rgba(59,130,246,0.35); text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700; color: #0f172a; transition: transform 400ms ease, box-shadow 400ms ease;
+        #e2e8f0 (RGB 226,232,240)
+        #38bdf8 (RGB 56,189,248)
+        #0f172a (RGB 15,23,42)
+
+
+Drücke Strg+C, um den Live-Reload zu beenden.
+>>> Live-Reload aktiv. Warte auf Änderungen an tailwind_style_catalog.i18n...
+make: *** [Makefile:34: run] Interrupt
+PS D:\mycelia_CSS> python generate_html.py
+Generated www\index.html
+Generated www\services.html
+Generated www\matrix.html
+Generated www\insights.html
+PS D:\mycelia_CSS>
