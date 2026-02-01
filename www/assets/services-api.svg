@@ -1,0 +1,8 @@
+<svg width="400" height="260" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="260" rx="24" fill="#0f172a" />
+  <g fill="none" stroke="rgba(59,130,246,0.5)" stroke-width="8">
+    <circle cx="200" cy="130" r="70" />
+    <circle cx="200" cy="130" r="30" />
+  </g>
+  <line x1="80" y1="130" x2="320" y2="130" stroke="rgba(14,165,233,0.4)" stroke-width="6" />
+</svg>

@@ -64,27 +64,27 @@ main {
 """
 
 HOME_CARDS = [
-    ("#eef2ff", "Sichere Kanäle", "<p>Verschlüsselung über den gesamten Stack.</p>"),
-    ("#f4f3ff", "Global Reach", "<p>100+ Länder vertrauen der Matrix.</p>"),
-    ("#ffedec", "SubQG Health", "<p>Reibung &amp; Masse in perfektem Balance.</p>"),
+    ("tpl_image-card", ["assets/home-grid.svg", "Sichere Kanäle", "<p>Verschlüsselung über den gesamten Stack.</p>"]),
+    ("tpl_image-card", ["assets/home-global.svg", "Global Reach", "<p>100+ Länder vertrauen der Matrix.</p>"]),
+    ("tpl_image-card", ["assets/home-health.svg", "SubQG Health", "<p>Reibung &amp; Masse in perfektem Balance.</p>"]),
 ]
 
 SERVICES_CARDS = [
-    ("#dbeafe", "Managed Matrix", "<p>Dedizierte Operatoren routen Daten in Echtzeit.</p>"),
-    ("#e0f2fe", "API Fabric", "<p>Starke Contracts mit deterministischen Antwortzeiten.</p>"),
-    ("#fee2e2", "Quantum Observability", "<p>Messungen, die auch bei hoher Masse bleiben.</p>"),
+    ("tpl_image-card", ["assets/services-ops.svg", "Managed Matrix", "<p>Dedizierte Operatoren routen Daten in Echtzeit.</p>"]),
+    ("tpl_image-card", ["assets/services-api.svg", "API Fabric", "<p>Starke Contracts mit deterministischen Antwortzeiten.</p>"]),
+    ("tpl_image-card", ["assets/services-quantum.svg", "Quantum Observability", "<p>Messungen, die bei hoher Masse Performanz halten.</p>"]),
 ]
 
 MATRIX_CARDS = [
-    ("#e0f7fa", "Dynamic Grid", "<p>Echtzeit-Skalen über hunderte Cubes auf der GPU.</p>"),
-    ("#d9f99d", "Live Physics", "<p>Massen, Reibung und Spacing werden als JSON injiziert.</p>"),
-    ("#fde68a", "AI Orchestrator", "<p>Signal-Baum passt sich an neue Tailwind-Styles an.</p>"),
+    ("tpl_image-card", ["assets/matrix-grid.svg", "Dynamic Grid", "<p>Echtzeit-Skalen über hunderte Cubes auf der GPU.</p>"]),
+    ("tpl_image-card", ["assets/matrix-physics.svg", "Live Physics", "<p>Massen, Reibung und Spacing als JSON.</p>"]),
+    ("tpl_image-card", ["assets/matrix-ai.svg", "AI Orchestrator", "<p>Signal-Baum passt sich an neue Tailwind-Styles an.</p>"]),
 ]
 
 INSIGHTS_CARDS = [
-    ("#ecfeff", "Telemetry", "<p>SubQG-Telemetrien zeigen Health bis in die Tiefe.</p>"),
-    ("#f5d0fe", "Forecast", "<p>Voraussagen der Grid-Stabilität basierend auf Physik.</p>"),
-    ("#fee2b3", "SubQG Intelligence", "<p>Decision-Matrix lernt aus jeder Button-Interaktion.</p>"),
+    ("tpl_image-card", ["assets/insights-telemetry.svg", "Telemetry", "<p>SubQG-Telemetrien zeigen Health bis in die Tiefe.</p>"]),
+    ("tpl_image-card", ["assets/insights-forecast.svg", "Forecast", "<p>Voraussagen der Grid-Stabilität basierend auf Physik.</p>"]),
+    ("tpl_image-card", ["assets/insights-subqg.svg", "SubQG Intelligence", "<p>Decision-Matrix lernt aus jeder Button-Interaktion.</p>"]),
 ]
 
 PAGE_DEFINITIONS = [
@@ -210,11 +210,11 @@ def extract_style_blocks(rendered: str) -> tuple[list[str], str]:
     return styles, remaining
 
 
-def render_card_set(engine: NativeEngine, card_defs: list[tuple[str, str, str]]) -> tuple[list[str], str]:
+def render_card_set(engine: NativeEngine, card_defs: list[tuple[str, list[str]]]) -> tuple[list[str], str]:
     styles = []
     bodies = []
-    for color, title, body_content in card_defs:
-        rendered_card = engine.render_to_html("tpl_card", [color, title, body_content])
+    for template, args in card_defs:
+        rendered_card = engine.render_to_html(template, args)
         card_styles, card_markup = extract_style_blocks(rendered_card)
         styles.extend(card_styles)
         bodies.append(card_markup)
@@ -268,7 +268,7 @@ def build_document_with_physics(style_block: str, body: str, animation_script: s
     )
 
 
-def build_page(engine: NativeEngine, hero_title: str, card_defs: list[tuple[str, str, str]], output_path: Path) -> None:
+def build_page(engine: NativeEngine, hero_title: str, card_defs: list[tuple[str, list[str]]], output_path: Path) -> None:
     card_styles, grid_content = render_card_set(engine, card_defs)
     html_payload = engine.render_to_html("tpl_full-page", [hero_title, grid_content])
     template_styles, body_markup = extract_style_blocks(html_payload)

@@ -1,0 +1,9 @@
+<svg width="400" height="260" xmlns="http://www.w3.org/2000/svg">
+  <linearGradient id="g7" x1="0%" x2="100%" y1="0%" y2="100%">
+    <stop offset="0%" stop-color="#22d3ee" />
+    <stop offset="100%" stop-color="#0ea5e9" />
+  </linearGradient>
+  <rect width="400" height="260" rx="24" fill="url(#g7)" />
+  <rect x="60" y="70" width="280" height="120" rx="24" fill="rgba(15,23,42,0.2)" />
+  <circle cx="200" cy="130" r="60" fill="rgba(255,255,255,0.25)" />
+</svg>

@@ -1,0 +1,11 @@
+<svg width="400" height="260" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="260" rx="24" fill="url(#g6)" />
+  <defs>
+    <linearGradient id="g6" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#a3e635" />
+      <stop offset="100%" stop-color="#65a30d" />
+    </linearGradient>
+  </defs>
+  <polyline points="40,210 120,150 200,170 280,120 360,140" fill="none" stroke="#111827" stroke-width="10" stroke-linecap="round" />
+  <circle cx="360" cy="140" r="12" fill="#111827" />
+</svg>
