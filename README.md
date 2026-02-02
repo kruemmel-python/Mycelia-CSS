@@ -1,8 +1,13 @@
 # Mycelia CSS — Native Style & Physics Engine
+<img width="2752" height="1536" alt="infogEN" src="https://github.com/user-attachments/assets/7e8f40b8-1529-4f18-84c9-6c96798a8ded" />
 
 This repository hosts the **Mycelia I18n/Style Engine**, a hybrid translation/style catalog that is now also a **physics-aware layout driver**. The native C++ DLL stores `style_` tokens in the catalog, resolves placeholder values recursively, converts CSS concepts (e.g., `--mass`, `gap`, `transition`) into physical parameters, and exposes them for C#/Unity clients or native demos with zero-copy access via file mapping.
 
 ## Key Components
+
+
+https://github.com/user-attachments/assets/9cb503e4-137f-4fc1-832e-ca694b636cfd
+
 
 | Component | Purpose |
 | --- | --- |
