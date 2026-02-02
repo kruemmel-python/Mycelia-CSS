@@ -44,3 +44,13 @@ run: test_app
 
 clean:
 	$(CLEAN)
+
+build-ice:
+	$(PYTHON) write_assets.py
+	$(PYTHON) generate_html.py
+
+build-matrix:
+	$(PYTHON) write_matrix_assets.py
+	$(PYTHON) generate_matrix_html.py
+
+build-all: build-ice build-matrix
