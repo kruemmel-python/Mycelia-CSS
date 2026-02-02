@@ -1,0 +1,150 @@
+<!doctype html><html lang='de'><head><meta charset='utf-8'><title>SubQG Matrix Terminal</title><style>
+.style_base-container{display: flex; flex-direction: column; gap: 1rem; padding: 1.5rem; background-color: #020617; color: #f8fafc;}
+.style_cube-ice{--mass: 1.05; --friction: 0.08; --restitution: 0.72; --spacing: 0.8; background-color: #e2e8f0; border-color: #38bdf8; border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 20px 40px rgba(59,130,246,0.35); text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700; color: #0f172a; transition: transform 400ms ease, box-shadow 400ms ease;}
+.style_grid-3{display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem;}
+.style_hero-banner{display: flex; align-items: center; justify-content: space-between; gap: 2rem; padding: 2.5rem; border-radius: 1.75rem; background: linear-gradient(115deg, #312e81, #1e1b4b); box-shadow: 0 30px 60px rgba(15,23,42,0.55);}
+.style_lead{font-size: 2.1rem; font-weight: 700; color: #e0e7ff;}
+.style_nav-bar{display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; border-radius: 0 0 1.5rem 1.5rem; background: linear-gradient(135deg, #312e81, #0f172a); box-shadow: 0 20px 45px rgba(3,7,18,0.6);}
+.style_nav-cta{box-shadow: 0 10px 20px rgba(0,0,0,0.12); padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 600; border: none; transition: transform 120ms ease, box-shadow 120ms ease; color: #020617; background: #38bdf8; color: #020617; border-radius: 999px;}
+.style_nav-link{font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(248,250,252,0.9); font-weight: 500;}
+.style_primary-button{box-shadow: 0 10px 20px rgba(0,0,0,0.12); padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 600; border: none; transition: transform 120ms ease, box-shadow 120ms ease; color: #020617; background: #38bdf8; color: #020617;}
+.style_secondary-button{box-shadow: 0 10px 20px rgba(0,0,0,0.12); padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 600; border: none; transition: transform 120ms ease, box-shadow 120ms ease; color: #020617; background: transparent; border: 1px solid rgba(248,250,252,0.6); color: rgba(248,250,252,0.9);}
+.style_small-caps{letter-spacing: 0.35em; font-size: 0.75rem; text-transform: uppercase; color: rgba(226,232,240,0.8);}
+.style_subhead{font-size: 0.75rem; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(226,232,240,0.85);}
+.style_text-muted{color: rgba(226,232,240,0.75); font-size: 0.95rem; letter-spacing: 0.02em;}
+</style>
+<style>
+.style_card{border: 1px solid #00ff41; border-radius: 1rem; box-shadow: 0 20px 40px rgba(0,0,0,0.08); background-color: Telemetry; padding: 1.25rem; transition: transform 180ms ease, border-color 180ms ease;}
+.style_card-header{font-size: 1.125rem; font-weight: 600; color: #00ff41;}
+</style>
+<style>
+.style_card{border: 1px solid #00ff41; border-radius: 1rem; box-shadow: 0 20px 40px rgba(0,0,0,0.08); background-color: Forecast; padding: 1.25rem; transition: transform 180ms ease, border-color 180ms ease;}
+.style_card-header{font-size: 1.125rem; font-weight: 600; color: #00ff41;}
+</style>
+<style>
+.style_card{border: 1px solid #00ff41; border-radius: 1rem; box-shadow: 0 20px 40px rgba(0,0,0,0.08); background-color: SubQG Intelligence; padding: 1.25rem; transition: transform 180ms ease, border-color 180ms ease;}
+.style_card-header{font-size: 1.125rem; font-weight: 600; color: #00ff41;}
+</style>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: #0a0a0a;
+    color: #00ff41;
+    font-family: 'JetBrains Mono', monospace;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* CRT Scanline Effekt */
+body::before {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 2000;
+    background-size: 100% 3px, 3px 100%;
+    pointer-events: none;
+}
+
+/* Vertikales Log-Format Überschreibung */
+.style_grid-3 {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.style_card {
+    border: 1px solid #00ff41 !important;
+    background: rgba(0, 255, 65, 0.05) !important;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.style_card::before {
+    content: "> LOG_ENTRY_";
+    font-size: 0.7rem;
+    opacity: 0.5;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.style_card-header {
+    color: #00ff41 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.style_card-body {
+    color: #00ff41 !important;
+    opacity: 0.8;
+}
+
+#hero-ice {
+    border: 2px solid #00ff41;
+    background: rgba(0, 255, 65, 0.1);
+    box-shadow: 0 0 30px #00ff41;
+    color: #00ff41 !important;
+    clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%);
+}
+
+.style_nav-bar {
+    background: #000 !important;
+    border-bottom: 1px solid #00ff41;
+}
+
+.style_primary-button {
+    background: #00ff41 !important;
+    color: #000 !important;
+    border-radius: 0 !important;
+    font-weight: bold;
+}
+
+.style_secondary-button {
+    border: 1px solid #00ff41 !important;
+    color: #00ff41 !important;
+    border-radius: 0 !important;
+}
+
+/* Verstecke Bilder für den reinen Terminal-Look */
+.style_card-image {
+    display: none !important;
+}
+</style>
+  <script>
+    const MyceliaPhysics = {"style_base-container":{"mass":0.000000,"friction":0.000000,"spacing":1.000000},"style_cube-ice":{"mass":1.050000,"friction":0.080000,"spacing":0.800000},"style_grid-3":{"mass":0.000000,"friction":0.000000,"spacing":1.500000},"style_hero-banner":{"mass":0.000000,"friction":0.000000,"spacing":2.000000}};
+    const cubeStyle = MyceliaPhysics['style_cube-ice'] || {mass: 1, friction: 0.1, restitution: 0.9};
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const heroIce = document.getElementById('hero-ice');
+      if (!heroIce) return;
+
+      const mass = cubeStyle.mass || 1;
+      const restitution = 0.95; // Wir erzwingen explosive Restitution
+      const friction = cubeStyle.friction || 0.1;
+
+      function animate(time) {
+        // Explosives Jitter-Verhalten basierend auf Restitution
+        const jitterX = (Math.random() - 0.5) * restitution * 15;
+        const jitterY = (Math.random() - 0.5) * restitution * 15;
+        const scale = 1 + (Math.sin(time / 50) * 0.02 * mass);
+
+        heroIce.style.transform = `translate(${jitterX}px, ${jitterY}px) scale(${scale})`;
+        
+        // Zufälliges Flackern (Glitch-Effekt)
+        heroIce.style.opacity = Math.random() > 0.98 ? '0.3' : '1';
+
+        requestAnimationFrame(animate);
+      }
+      requestAnimationFrame(animate);
+    });
+  </script>
+</head><body><div class="style_base-container" style="min-height:100vh;"> <nav class="style_nav-bar"> <div class="style_small-caps">Mycelia Matrix</div> <div style="display:flex; gap:1rem; align-items:center;"> <a class="style_nav-link" href="index.html">Home</a> <a class="style_nav-link" href="services.html">Services</a> <a class="style_nav-link" href="matrix.html">Matrix</a> <a class="style_nav-link" href="insights.html">Insights</a> </div> <a class="style_nav-cta" href="services.html">Contact</a> </nav> <section class="style_hero-banner"> <div> <p class="style_subhead">Konzept Monitoring</p> <h1 class="style_lead">SUBQG INSIGHTS</h1> <p class="style_text-muted">Wir orchestrieren Tailwind-gestützte Styles und native Physik, damit dein Live-Grid sofort reagiert.</p> <div style="margin-top:1.5rem; display:flex; gap:0.75rem;"><a class="style_primary-button" href="services.html">Get in Touch</a><a class="style_secondary-button" href="insights.html">Explore More</a></div> </div> <div id="hero-ice" class="style_cube-ice">Live Ice Cube</div> </section> <div class="style_grid-3"><article class="style_card" style="background-color:#00ff41;"><h3 class="style_card-header">Telemetry</h3><p>SubQG-Telemetrien zeigen Health bis in die Tiefe.</p></article><article class="style_card" style="background-color:#00ff41;"><h3 class="style_card-header">Forecast</h3><p>Voraussagen der Grid-Stabilität basierend auf Physik.</p></article><article class="style_card" style="background-color:#00ff41;"><h3 class="style_card-header">SubQG Intelligence</h3><p>Decision-Matrix lernt aus jeder Button-Interaktion.</p></article></div> </div></body></html>
